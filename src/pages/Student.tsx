@@ -1094,6 +1094,18 @@ export function TournamentDetails() {
                   <StatusPill status={myRegistration.status} />
                 </div>
               </div>
+            ) : data.session?.role === "organizer" ? (
+              <div className="mt-4 rounded-xl bg-surface-2 p-3 text-center">
+                <p className="text-xs font-semibold muted">
+                  Organizers cannot register teams.
+                </p>
+                <Link
+                  to={`/organizer/manage/${tournament.id}`}
+                  className="btn-secondary mt-3 inline-flex w-full justify-center !rounded-xl text-xs"
+                >
+                  Manage this tournament
+                </Link>
+              </div>
             ) : (
               <>
                 <button

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Link,
   NavLink,
@@ -15,7 +15,6 @@ import {
   CircleUserRound,
   Command,
   Compass,
-  Crown,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -32,7 +31,6 @@ import {
 import { useApp } from "../app/AppContext";
 import { Avatar, SportIcon } from "./UI";
 import type { Tournament, Team, Match, Notice } from "../types";
-import { getStudentTeamIds } from "../services/domain";
 import { notificationService } from "../services/notificationService";
 
 const studentLinks = [
@@ -130,32 +128,12 @@ function Sidebar() {
           <Plus size={16} /> Create tournament
         </Link>
       )}
-      <div className="mt-auto rounded-[20px] bg-[#1c342b] p-4 text-white">
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime text-[#1c342b]">
-            <Crown size={15} />
-          </span>
-          <span className="text-xs font-bold">CampusAI</span>
-          <span className="ml-auto rounded-full bg-white/15 px-2 py-1 text-[9px] font-bold uppercase tracking-widest">
-            Beta
-          </span>
-        </div>
-        <p className="mt-3 text-xs leading-relaxed text-white/70">
-          Your campus sports sidekick, ready when you are.
-        </p>
-        <button
-          onClick={() => window.dispatchEvent(new Event("open-campus-ai"))}
-          className="mt-3 flex items-center gap-1 text-xs font-bold text-lime"
-        >
-          Ask a question <ArrowRightLeft size={13} />
-        </button>
-      </div>
       <button
         onClick={() => {
           signOut();
           navigate("/");
         }}
-        className="muted mt-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold hover:bg-surface-2 hover:text-ink"
+        className="muted mt-auto flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold hover:bg-surface-2 hover:text-ink"
       >
         <LogOut size={16} /> Sign out
       </button>
@@ -469,7 +447,7 @@ function MobileNav() {
     role === "organizer"
       ? [
           { to: "/organizer", label: "Home", icon: LayoutDashboard },
-          { to: "/organizer/registrations", label: "Teams", icon: Users },
+          { to: "/organizer/registrations", label: "Approvals", icon: Users },
           { to: "/organizer/fixtures", label: "Fixtures", icon: CalendarDays },
           { to: "/organizer/results", label: "Results", icon: Trophy },
         ]
@@ -502,156 +480,6 @@ function MobileNav() {
   );
 }
 
-function CampusAI() {
-  const [open, setOpen] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<
-    Array<{ from: "ai" | "you"; text: string }>
-  >([]);
-  const { data, user } = useApp();
-  const navigate = useNavigate();
-  useEffect(() => {
-    const openPanel = () => setOpen(true);
-    window.addEventListener("open-campus-ai", openPanel);
-    return () => window.removeEventListener("open-campus-ai", openPanel);
-  }, []);
-  const ask = (text: string) => {
-    const lower = text.toLowerCase();
-    let answer =
-      "I can help you find a tournament, team or venue. Try asking about your next match or today’s schedule.";
-    if (lower.includes("next match")) {
-      const myTeamIds = getStudentTeamIds(data, user?.id ?? "");
-      const next = data.matches
-        .filter(
-          (match) =>
-            match.status === "upcoming" &&
-            (myTeamIds.has(match.teamAId) || myTeamIds.has(match.teamBId)),
-        )
-        .sort((a, b) => a.date.localeCompare(b.date))[0];
-      answer = next
-        ? `Your next match is ${data.teams.find((team) => team.id === next.teamAId)?.name} vs ${data.teams.find((team) => team.id === next.teamBId)?.name} on ${new Date(`${next.date}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} at ${next.time} · ${next.venue}.`
-        : "No upcoming matches yet. Check back soon!";
-    } else if (lower.includes("today")) {
-      const today = data.matches.filter(
-        (match) => match.date === new Date().toISOString().slice(0, 10),
-      );
-      answer = today.length
-        ? `${today.length} fixture${today.length > 1 ? "s" : ""} are scheduled today. Open My Matches to see the schedule.`
-        : "No matches on today’s schedule. There are fixtures coming up tomorrow—check My Matches.";
-    } else if (lower.includes("won") || lower.includes("semifinal")) {
-      const semi = data.matches.find(
-        (match) =>
-          match.round.toLowerCase().includes("semi") &&
-          match.status === "completed" &&
-          data.tournaments.find(
-            (tournament) => tournament.id === match.tournamentId,
-          )?.sport === "Cricket",
-      );
-      answer = semi
-        ? `${data.teams.find((team) => team.id === semi.winnerId)?.name ?? "The winning side"} won the semifinal ${semi.scoreA}–${semi.scoreB}.`
-        : "The cricket semifinal is underway—follow the live score in Fixtures.";
-    } else if (lower.includes("tournament") || lower.includes("register")) {
-      answer =
-        "Registration is open for Inter-Class Cricket, Campus Football League, and the Campus Athletics Meet. Let’s find your next team.";
-      navigate("/app/tournaments");
-    }
-    setMessages((current) => [
-      ...current,
-      { from: "you", text },
-      { from: "ai", text: answer },
-    ]);
-    setQuestion("");
-  };
-  return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-5 z-40 flex items-center gap-2 rounded-full bg-[#1c342b] px-4 py-3 text-xs font-bold text-white shadow-xl transition hover:-translate-y-1 md:bottom-6 md:right-7"
-      >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-lime text-[#1c342b]">
-          ✦
-        </span>
-        <span>CampusAI</span>
-      </button>
-      {open && (
-        <div className="surface fade-up fixed bottom-24 right-4 z-[85] flex h-[min(570px,calc(100vh-135px))] w-[min(370px,calc(100vw-32px))] flex-col overflow-hidden rounded-[26px] shadow-2xl md:bottom-24 md:right-7">
-          <div className="flex items-center gap-3 bg-[#1c342b] p-4 text-white">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-lime text-[#1c342b]">
-              ✦
-            </span>
-            <div>
-              <h2 className="text-sm font-extrabold">CampusAI</h2>
-              <p className="mt-0.5 text-[10px] text-white/65">
-                Your campus sports sidekick
-              </p>
-            </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-white/10"
-              aria-label="Close CampusAI"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            <div className="max-w-[90%] rounded-2xl rounded-tl-md bg-surface-2 p-3 text-xs leading-relaxed">
-              👋 Hi {user?.name.split(" ")[0] ?? "there"}! How can I help you
-              get in the game?
-            </div>
-            {messages.map((message, i) => (
-              <div
-                key={i}
-                className={`max-w-[90%] rounded-2xl p-3 text-xs leading-relaxed ${message.from === "you" ? "ml-auto rounded-tr-md bg-[#1c342b] text-white" : "rounded-tl-md bg-surface-2"}`}
-              >
-                {message.text}
-              </div>
-            ))}
-            {messages.length === 0 && (
-              <div className="space-y-2 pt-1">
-                {[
-                  "What is my next match?",
-                  "Show today’s matches",
-                  "Who won the cricket semifinal?",
-                ].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    onClick={() => ask(suggestion)}
-                    className="block w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-[11px] font-semibold hover:bg-surface-2"
-                  >
-                    {suggestion}
-                    <span className="muted float-right">↗</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (question.trim()) ask(question.trim());
-            }}
-            className="flex gap-2 border-t border-[var(--line)] p-3"
-          >
-            <input
-              value={question}
-              onChange={(event) => setQuestion(event.target.value)}
-              className="input-field !rounded-full !py-2.5 text-xs"
-              placeholder="Ask CampusAI…"
-              aria-label="Ask CampusAI"
-            />
-            <button
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lime text-ink"
-              aria-label="Send message"
-            >
-              <ArrowRightLeft size={16} />
-            </button>
-          </form>
-        </div>
-      )}
-    </>
-  );
-}
-
 export function AppShell() {
   const { toast, clearToast } = useApp();
   const location = useLocation();
@@ -674,7 +502,6 @@ export function AppShell() {
         </main>
       </div>
       <MobileNav />
-      <CampusAI />
       {toast && (
         <div
           role="status"
