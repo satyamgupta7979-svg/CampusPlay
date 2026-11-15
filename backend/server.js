@@ -36,7 +36,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://127.0.0.1:5173',
-  'https://campusplay-18gw53m5k-codenova-91a9.vercel.app/'
+  'https://campusplay-git-main-codenova-91a9.vercel.app/'
 ];
 
 app.use(
