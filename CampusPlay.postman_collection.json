@@ -1,0 +1,366 @@
+{
+  "info": {
+    "name": "CampusPlay REST API Collection",
+    "_postman_id": "c1f7b53a-4e2a-4c28-8d01-e7f093d396aa",
+    "description": "Comprehensive Postman/Hoppscotch Collection for CampusPlay Full-Stack College Sports Management Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "API Root & Health",
+      "item": [
+        {
+          "name": "API Health Check (GET /api)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] }
+          }
+        },
+        {
+          "name": "Detailed Health Check (GET /api/health)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Player\",\n  \"email\": \"test.player@campus.edu\",\n  \"password\": \"password123\",\n  \"collegeId\": \"CP990011\",\n  \"department\": \"Computer Science\",\n  \"year\": \"2nd Year\",\n  \"section\": \"B\",\n  \"role\": \"student\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jasnoor.kaur@campus.edu\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Organizer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sports@campus.edu\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "Get All Tournaments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments", "host": ["{{baseUrl}}"], "path": ["tournaments"] }
+          }
+        },
+        {
+          "name": "Get Tournament By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments/:id", "host": ["{{baseUrl}}"], "path": ["tournaments", ":id"] }
+          }
+        },
+        {
+          "name": "Create Tournament (Organizer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Annual Cricket Carnival 2026\",\n  \"sport\": \"Cricket\",\n  \"description\": \"Inter-department cricket showdown\",\n  \"startDate\": \"2026-12-01\",\n  \"endDate\": \"2026-12-10\",\n  \"registrationDeadline\": \"2026-11-28\",\n  \"venue\": \"Koshish Ground\",\n  \"format\": \"Knockout\",\n  \"maxTeams\": 16,\n  \"playersPerTeam\": 11,\n  \"registrationType\": \"Team\",\n  \"rules\": [\"11 players per team\", \"College ID required\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tournaments", "host": ["{{baseUrl}}"], "path": ["tournaments"] }
+          }
+        },
+        {
+          "name": "Get Tournament Teams",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments/:id/teams", "host": ["{{baseUrl}}"], "path": ["tournaments", ":id", "teams"] }
+          }
+        },
+        {
+          "name": "Get Tournament Fixtures",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments/:id/fixtures", "host": ["{{baseUrl}}"], "path": ["tournaments", ":id", "fixtures"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Get All Teams",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/teams", "host": ["{{baseUrl}}"], "path": ["teams"] }
+          }
+        },
+        {
+          "name": "Get Team By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/teams/:id", "host": ["{{baseUrl}}"], "path": ["teams", ":id"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrations",
+      "item": [
+        {
+          "name": "Register Team / Individual",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournamentId\": \"<tournamentId>\",\n  \"type\": \"team\",\n  \"teamName\": \"CSE Superstars\",\n  \"captainName\": \"Jasnoor Kaur\",\n  \"playerNames\": [\"Jasnoor Kaur\", \"Aarav Patel\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/registrations", "host": ["{{baseUrl}}"], "path": ["registrations"] }
+          }
+        },
+        {
+          "name": "Get My Registrations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/registrations/my", "host": ["{{baseUrl}}"], "path": ["registrations", "my"] }
+          }
+        },
+        {
+          "name": "Get All Registrations (Organizer)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/registrations", "host": ["{{baseUrl}}"], "path": ["registrations"] }
+          }
+        },
+        {
+          "name": "Update Registration Status (Organizer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/registrations/:id/status", "host": ["{{baseUrl}}"], "path": ["registrations", ":id", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches & Fixtures",
+      "item": [
+        {
+          "name": "Get All Matches",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/matches", "host": ["{{baseUrl}}"], "path": ["matches"] }
+          }
+        },
+        {
+          "name": "Create Match Fixture (Organizer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournamentId\": \"<tournamentId>\",\n  \"round\": \"Semi Final\",\n  \"teamAId\": \"<teamAId>\",\n  \"teamBId\": \"<teamBId>\",\n  \"date\": \"2026-11-28\",\n  \"time\": \"2:00 PM\",\n  \"venue\": \"Koshish Ground\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/matches", "host": ["{{baseUrl}}"], "path": ["matches"] }
+          }
+        },
+        {
+          "name": "Update Live Score (Organizer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scoreA\": \"84/4\",\n  \"scoreB\": \"79/6\",\n  \"overs\": \"9.1 overs\",\n  \"notice\": \"Live thriller!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/matches/:id/score", "host": ["{{baseUrl}}"], "path": ["matches", ":id", "score"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results & Leaderboard",
+      "item": [
+        {
+          "name": "Submit Match Result (Organizer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scoreA\": \"92\",\n  \"scoreB\": \"88\",\n  \"winnerId\": \"<winnerTeamId>\",\n  \"notice\": \"CSE Warriors won by 4 runs\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/results/:matchId", "host": ["{{baseUrl}}"], "path": ["results", ":matchId"] }
+          }
+        },
+        {
+          "name": "Get Completed Results",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/results", "host": ["{{baseUrl}}"], "path": ["results"] }
+          }
+        },
+        {
+          "name": "Get Tournament Leaderboard",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/results/leaderboard/:tournamentId", "host": ["{{baseUrl}}"], "path": ["results", "leaderboard", ":tournamentId"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/notifications", "host": ["{{baseUrl}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Mark All As Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/notifications/read-all", "host": ["{{baseUrl}}"], "path": ["notifications", "read-all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics (Organizer)",
+      "item": [
+        {
+          "name": "Dashboard Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/analytics/dashboard", "host": ["{{baseUrl}}"], "path": ["analytics", "dashboard"] }
+          }
+        },
+        {
+          "name": "Participation Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/analytics/participation", "host": ["{{baseUrl}}"], "path": ["analytics", "participation"] }
+          }
+        },
+        {
+          "name": "Performance Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/analytics/performance", "host": ["{{baseUrl}}"], "path": ["analytics", "performance"] }
+          }
+        }
+      ]
+    }
+  ]
+}

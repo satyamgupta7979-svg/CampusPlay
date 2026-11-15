@@ -1,0 +1,23 @@
+{
+  "routes": [
+    { "path": "/", "title": "CampusPlay — Home" },
+    { "path": "/login", "title": "CampusPlay — Login" },
+    { "path": "/register", "title": "CampusPlay — Register" },
+    { "path": "/app", "title": "CampusPlay — Student dashboard" },
+    { "path": "/app/tournaments", "title": "CampusPlay — Tournaments" },
+    { "path": "/app/tournaments/:id", "title": "CampusPlay — Tournament details" },
+    { "path": "/app/registrations", "title": "CampusPlay — My registrations" },
+    { "path": "/app/matches", "title": "CampusPlay — My matches" },
+    { "path": "/app/matches/:id", "title": "CampusPlay — Match details" },
+    { "path": "/app/results", "title": "CampusPlay — Results" },
+    { "path": "/app/leaderboard", "title": "CampusPlay — Leaderboard" },
+    { "path": "/app/profile", "title": "CampusPlay — Profile" },
+    { "path": "/organizer", "title": "CampusPlay — Organizer dashboard" },
+    { "path": "/organizer/create", "title": "CampusPlay — Create tournament" },
+    { "path": "/organizer/manage/:id", "title": "CampusPlay — Manage tournament" },
+    { "path": "/organizer/registrations", "title": "CampusPlay — Manage registrations" },
+    { "path": "/organizer/fixtures", "title": "CampusPlay — Manage fixtures" },
+    { "path": "/organizer/results", "title": "CampusPlay — Manage results" },
+    { "path": "/organizer/analytics", "title": "CampusPlay — Analytics" }
+  ]
+}
